@@ -7,7 +7,6 @@
 * [Linter](#linter)
 <!-- TOC -->
 
-
 ## Run
 To run the application:
 

@@ -63,7 +63,9 @@ func (s *Service) processResourceLogs(ctx context.Context, resourceLogs *logpb.R
 	span := trace.SpanFromContext(ctx)
 	span.AddEvent("Service::processResourceLogs")
 
-	s.processAttributes(resourceLogs.Resource.Attributes)
+	if resourceLogs.Resource != nil && resourceLogs.Resource.Attributes != nil {
+		s.processAttributes(resourceLogs.Resource.Attributes)
+	}
 
 	var wg sync.WaitGroup
 	for _, scopeLogs := range resourceLogs.ScopeLogs {
@@ -82,7 +84,9 @@ func (s *Service) processScopeLogs(ctx context.Context, scopeLogs *logpb.ScopeLo
 	span := trace.SpanFromContext(ctx)
 	span.AddEvent("Service::processScopeLogs")
 
-	s.processAttributes(scopeLogs.Scope.Attributes)
+	if scopeLogs.Scope != nil && scopeLogs.Scope.Attributes != nil {
+		s.processAttributes(scopeLogs.Scope.Attributes)
+	}
 
 	var wg sync.WaitGroup
 	for _, logRecord := range scopeLogs.LogRecords {
