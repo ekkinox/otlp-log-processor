@@ -20,9 +20,9 @@ func TestTicker(t *testing.T) {
 
 	var buf bytes.Buffer
 
-	ticker := internal.NewTicker(&buf, str, "attr", 100)
+	ticker := internal.NewTicker(&buf, str, "attr", 1)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
 	defer cancel()
 
 	go ticker.Start(ctx)
