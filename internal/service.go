@@ -3,8 +3,6 @@ package internal
 import (
 	"context"
 
-	"go.opentelemetry.io/contrib/bridges/otelslog"
-	"go.opentelemetry.io/otel"
 	pb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 )
 
@@ -13,10 +11,10 @@ type LogServiceServer struct {
 }
 
 func (s *LogServiceServer) Export(ctx context.Context, req *pb.ExportLogsServiceRequest) (*pb.ExportLogsServiceResponse, error) {
-	ctx, span := otel.Tracer(Name).Start(ctx, "LogServiceServer::Export")
+	ctx, span := Tracer().Start(ctx, "LogServiceServer::Export")
 	defer span.End()
 
-	logger := otelslog.NewLogger(Name)
+	logger := Logger()
 
 	logger.InfoContext(ctx, "LogServiceServer::Export")
 
