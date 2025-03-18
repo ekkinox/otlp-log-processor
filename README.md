@@ -5,6 +5,7 @@
 * [Build](#build)
 * [Tests](#tests)
 * [Linter](#linter)
+* [O11y](#o11y)
 <!-- TOC -->
 
 ## Run
@@ -41,3 +42,9 @@ To run the [linter](https://golangci-lint.run/):
 ```shell
 golangci-lint run ./... 
 ```
+
+## O11y
+
+This gRPC server is instrumented with OTel logger and tracer (both exporting to stdout).
+
+Logs produced during gRPC processing are correlated to the traces.
