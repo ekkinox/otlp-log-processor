@@ -16,35 +16,49 @@ import (
 func main() {
 	ctx := context.Background()
 
+	fmt.Println("starting...")
+
+	cfg := internal.NewConfig()
+	str := internal.NewStorage()
+	svc := internal.NewService(str, cfg.Attribute(), cfg.Workers())
+	srv := internal.NewServer(svc, grpc.StatsHandler(otelgrpc.NewServerHandler()))
+	tkr := internal.NewTicker(str, cfg.Attribute(), cfg.Interval())
+
+	fmt.Println("starting OTel components...")
 	stopOTel, err := internal.SetupOTel(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ctx, stopApp := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
-	defer stopApp()
-
-	lis, err := net.Listen("tcp", ":4317")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	srv := internal.NewServer(
-		grpc.StatsHandler(otelgrpc.NewServerHandler()),
-	)
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 
 	go func() {
-		fmt.Println("starting server on :4317...")
+		lis, err := net.Listen("tcp", ":4317")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println("starting gRPC server on :4317...")
 		if err := srv.Serve(lis); err != nil {
 			log.Fatal(err)
 		}
 	}()
 
+	go func() {
+		fmt.Println("starting ticker...")
+		tkr.Start(ctx)
+	}()
+
 	<-ctx.Done()
 
-	log.Println("stopping server...")
+	log.Println("stopping gRPC server...")
 	srv.GracefulStop()
-	log.Println("stopping OTel...")
+
+	log.Println("stopping OTel components...")
 	stopOTel()
+
+	log.Println("stopping...")
+	stop()
+
 	log.Println("stopped")
 }

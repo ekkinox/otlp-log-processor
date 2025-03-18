@@ -6,10 +6,10 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func NewServer(opts ...grpc.ServerOption) *grpc.Server {
+func NewServer(svc *Service, opts ...grpc.ServerOption) *grpc.Server {
 	srv := grpc.NewServer(opts...)
 
-	pb.RegisterLogsServiceServer(srv, &LogServiceServer{})
+	pb.RegisterLogsServiceServer(srv, svc)
 	reflection.Register(srv)
 
 	return srv
