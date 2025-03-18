@@ -3,17 +3,20 @@ package internal
 import (
 	"context"
 	"fmt"
+	"io"
 	"time"
 )
 
 type Ticker struct {
+	writer    io.Writer
 	storage   *Storage
 	attribute string
 	interval  int
 }
 
-func NewTicker(storage *Storage, attribute string, interval int) *Ticker {
+func NewTicker(writer io.Writer, storage *Storage, attribute string, interval int) *Ticker {
 	return &Ticker{
+		writer:    writer,
 		storage:   storage,
 		attribute: attribute,
 		interval:  interval,
@@ -29,18 +32,18 @@ func (t *Ticker) Start(ctx context.Context) {
 		case <-tick.C:
 			t.displayStorage()
 		case <-ctx.Done():
-			fmt.Println("stopping ticker...")
+			fmt.Fprintln(t.writer, "stopping ticker...")
 			return
 		}
 	}
 }
 
 func (t *Ticker) displayStorage() {
-	fmt.Printf("attribute %s values:\n", t.attribute)
+	fmt.Fprintf(t.writer, "%s occurrences:\n", t.attribute)
 
 	for k, v := range t.storage.Dump() {
-		fmt.Println("\t", k, ":", v)
+		fmt.Fprintf(t.writer, "\t%s: %d\n", k, v)
 	}
 
-	fmt.Println("")
+	fmt.Fprintln(t.writer, "")
 }

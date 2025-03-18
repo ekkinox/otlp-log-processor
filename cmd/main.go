@@ -22,7 +22,7 @@ func main() {
 	str := internal.NewStorage()
 	svc := internal.NewService(str, cfg.Attribute(), cfg.Workers())
 	srv := internal.NewServer(svc, grpc.StatsHandler(otelgrpc.NewServerHandler()))
-	tkr := internal.NewTicker(str, cfg.Attribute(), cfg.Interval())
+	tkr := internal.NewTicker(os.Stdout, str, cfg.Attribute(), cfg.Interval())
 
 	fmt.Println("starting OTel components...")
 	stopOTel, err := internal.SetupOTel(ctx)
