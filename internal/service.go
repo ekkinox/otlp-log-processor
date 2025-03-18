@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	collecctorpb "go.opentelemetry.io/proto/otlp/collector/logs/v1"
 	commonpb "go.opentelemetry.io/proto/otlp/common/v1"
 	logpb "go.opentelemetry.io/proto/otlp/logs/v1"
@@ -25,7 +27,15 @@ func NewService(storage *Storage, attribute string, workers int) *Service {
 }
 
 func (s *Service) Export(ctx context.Context, req *collecctorpb.ExportLogsServiceRequest) (*collecctorpb.ExportLogsServiceResponse, error) {
-	jobs := make(chan *logpb.ResourceLogs, len(req.ResourceLogs))
+	resourceLogsLen := len(req.ResourceLogs)
+
+	ctx, span := Tracer().Start(ctx, "Service::Export")
+	span.SetAttributes(attribute.Int("resource.logs", resourceLogsLen))
+	defer span.End()
+
+	Logger().InfoContext(ctx, "Service::Export")
+
+	jobs := make(chan *logpb.ResourceLogs, resourceLogsLen)
 	var wg sync.WaitGroup
 
 	for i := 0; i < s.workers; i++ {
@@ -34,7 +44,7 @@ func (s *Service) Export(ctx context.Context, req *collecctorpb.ExportLogsServic
 		go func() {
 			defer wg.Done()
 			for resourceLogs := range jobs {
-				s.processResourceLogs(resourceLogs)
+				s.processResourceLogs(ctx, resourceLogs)
 			}
 		}()
 	}
@@ -49,7 +59,10 @@ func (s *Service) Export(ctx context.Context, req *collecctorpb.ExportLogsServic
 	return &collecctorpb.ExportLogsServiceResponse{}, nil
 }
 
-func (s *Service) processResourceLogs(resourceLogs *logpb.ResourceLogs) {
+func (s *Service) processResourceLogs(ctx context.Context, resourceLogs *logpb.ResourceLogs) {
+	span := trace.SpanFromContext(ctx)
+	span.AddEvent("Service::processResourceLogs")
+
 	s.processAttributes(resourceLogs.Resource.Attributes)
 
 	var wg sync.WaitGroup
@@ -58,14 +71,17 @@ func (s *Service) processResourceLogs(resourceLogs *logpb.ResourceLogs) {
 		go func(scopeLogs *logpb.ScopeLogs) {
 			defer wg.Done()
 
-			s.processScopeLogs(scopeLogs)
+			s.processScopeLogs(ctx, scopeLogs)
 		}(scopeLogs)
 	}
 
 	wg.Wait()
 }
 
-func (s *Service) processScopeLogs(scopeLogs *logpb.ScopeLogs) {
+func (s *Service) processScopeLogs(ctx context.Context, scopeLogs *logpb.ScopeLogs) {
+	span := trace.SpanFromContext(ctx)
+	span.AddEvent("Service::processScopeLogs")
+
 	s.processAttributes(scopeLogs.Scope.Attributes)
 
 	var wg sync.WaitGroup
@@ -74,14 +90,17 @@ func (s *Service) processScopeLogs(scopeLogs *logpb.ScopeLogs) {
 		go func(logRecord *logpb.LogRecord) {
 			defer wg.Done()
 
-			s.processLogRecord(logRecord)
+			s.processLogRecord(ctx, logRecord)
 		}(logRecord)
 	}
 
 	wg.Wait()
 }
 
-func (s *Service) processLogRecord(logRecord *logpb.LogRecord) {
+func (s *Service) processLogRecord(ctx context.Context, logRecord *logpb.LogRecord) {
+	span := trace.SpanFromContext(ctx)
+	span.AddEvent("Service::processLogRecord")
+
 	s.processAttributes(logRecord.Attributes)
 }
 
