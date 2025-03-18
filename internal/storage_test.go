@@ -22,10 +22,10 @@ func TestStorage(t *testing.T) {
 		res := str.Dump()
 
 		if res["foo"] != 2 {
-			t.Errorf("expected foo to have 2 occurences")
+			t.Errorf("expected foo to have 2 occurrences")
 		}
 		if res["bar"] != 1 {
-			t.Errorf("expected bar to have 1 occurences")
+			t.Errorf("expected bar to have 1 occurrences")
 		}
 	})
 

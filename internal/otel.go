@@ -53,7 +53,6 @@ func SetupOTel(ctx context.Context) (context.CancelFunc, error) {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 	}, nil
 }
 

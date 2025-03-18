@@ -1,1 +1,44 @@
-# otlp-log-processor
+# OTLP Log Processor
+
+<!-- TOC -->
+* [Run](#run)
+* [Build](#build)
+* [Tests](#tests)
+* [Linter](#linter)
+<!-- TOC -->
+
+
+## Run
+To run the application:
+
+```shell
+go run ./... --attribute={attribute} --interval={interval} --workers={workers}
+```
+
+- `{attribute}`: name of the log attribute to count, default `foo`
+- `{interval}`: interval in milliseconds for printing the count, default `1000`
+- `{workers}`: number of workers for the logs processing, default `10`
+
+## Build
+
+To build the application:
+
+```shell
+go build ./...
+```
+
+## Tests
+
+To run the tests:
+
+```shell
+go test -v -race -failfast ./...
+```
+
+## Linter
+
+To run the [linter](https://golangci-lint.run/):
+
+```shell
+golangci-lint run ./... 
+```

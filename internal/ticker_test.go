@@ -11,8 +11,6 @@ import (
 )
 
 func TestTicker(t *testing.T) {
-	t.Parallel()
-
 	str := internal.NewStorage()
 	str.Store("foo")
 	str.Store("bar")
@@ -22,13 +20,15 @@ func TestTicker(t *testing.T) {
 
 	ticker := internal.NewTicker(&buf, str, "attr", 1)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Millisecond)
 	defer cancel()
 
-	go ticker.Start(ctx)
+	ticker.Start(ctx)
 
 	<-ctx.Done()
 
-	assert.Contains(t, buf.String(), "foo: 2")
-	assert.Contains(t, buf.String(), "bar: 1")
+	bufStr := buf.String()
+
+	assert.Contains(t, bufStr, "foo: 2")
+	assert.Contains(t, bufStr, "bar: 1")
 }

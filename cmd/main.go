@@ -33,7 +33,8 @@ func main() {
 	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, os.Kill)
 
 	go func() {
-		lis, err := net.Listen("tcp", ":4317")
+		//nolint:gosec
+		lis, err := net.Listen("tcp", "0.0.0.0:4317")
 		if err != nil {
 			log.Fatal(err)
 		}

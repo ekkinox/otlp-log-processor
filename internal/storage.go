@@ -26,7 +26,9 @@ func (s *Storage) Dump() map[string]int64 {
 	result := make(map[string]int64)
 
 	s.data.Range(func(k, v any) bool {
+		//nolint:forcetypeassert
 		result[k.(string)] = v.(*atomic.Int64).Load()
+
 		return true
 	})
 

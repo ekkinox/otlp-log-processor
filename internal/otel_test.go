@@ -15,7 +15,6 @@ func TestOTel(t *testing.T) {
 
 	stop, err := internal.SetupOTel(context.Background())
 	assert.NoError(t, err)
-	defer stop()
 
 	t.Run("test tracer", func(t *testing.T) {
 		t.Parallel()
@@ -34,4 +33,6 @@ func TestOTel(t *testing.T) {
 		assert.NotNil(t, logger)
 		assert.IsType(t, &slog.Logger{}, logger)
 	})
+
+	stop()
 }

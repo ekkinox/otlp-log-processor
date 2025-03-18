@@ -33,6 +33,7 @@ func (t *Ticker) Start(ctx context.Context) {
 			t.displayStorage()
 		case <-ctx.Done():
 			fmt.Fprintln(t.writer, "stopping ticker...")
+
 			return
 		}
 	}
