@@ -9,7 +9,7 @@
 <!-- TOC -->
 
 ## Run
-To run the application:
+To run the gRPC application on `:4317` (with reflection enabled):
 
 ```shell
 go run ./... --attribute={attribute} --interval={interval} --workers={workers}
@@ -45,6 +45,6 @@ golangci-lint run ./...
 
 ## O11y
 
-This gRPC server is instrumented with OTel logger and tracer (both exporting to stdout).
+This gRPC application is instrumented with OTel logger and tracer (both exporting to stdout).
 
 Logs produced during gRPC processing are correlated to the traces.
