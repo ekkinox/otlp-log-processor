@@ -4,6 +4,7 @@
 * [Run](#run)
 * [Build](#build)
 * [Tests](#tests)
+* [Benchmark](#benchmark)
 * [Linter](#linter)
 * [O11y](#o11y)
 <!-- TOC -->
@@ -33,6 +34,14 @@ To run the tests:
 
 ```shell
 go test -v -race -failfast ./...
+```
+
+## Benchmark
+
+To run the benchmark:
+
+```shell
+go test -v -bench=Service -benchtime 5s -benchmem ./...
 ```
 
 ## Linter

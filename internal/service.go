@@ -109,13 +109,19 @@ func (s *Service) processLogRecord(ctx context.Context, logRecord *logpb.LogReco
 }
 
 func (s *Service) processAttributes(attrs []*commonpb.KeyValue) {
-	m := make(map[string]string, len(attrs))
+	/*	m := make(map[string]string, len(attrs))
+
+		for _, attr := range attrs {
+			m[attr.Key] = attr.Value.String()
+		}
+
+		if v, ok := m[s.attribute]; ok {
+			s.storage.Store(v)
+		}*/
 
 	for _, attr := range attrs {
-		m[attr.Key] = attr.Value.String()
-	}
-
-	if v, ok := m[s.attribute]; ok {
-		s.storage.Store(v)
+		if attr.Key == s.attribute {
+			s.storage.Store(attr.Value.String())
+		}
 	}
 }
